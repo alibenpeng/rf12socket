@@ -41,7 +41,7 @@ static void blinkLed (uint8_t repeats, uint8_t delay) {
 		_delay_ms(delay);
 		digitalWrite(LED_PIN, LOW);
 	}
-	pinMode(LED_PIN, INPUT);
+	//pinMode(LED_PIN, INPUT);
 }
 
 void receiveRF12() {
@@ -53,6 +53,7 @@ void receiveRF12() {
 		if ((socket.mcu_id == eeprom_mcu_id) && (socket.socket_id > 0) && (socket.socket_id <= MAX_ID)) {
 			if (socket.command == 'S') {
 				if ((socket.state == 0) || (socket.state == 1)) {
+					digitalWrite(LED_PIN, socket.state);
 					digitalWrite(socket_ids[socket.socket_id - 1], socket.state);
 					socket_state[socket.socket_id - 1] = socket.state;
 					send_ack = 1;
@@ -100,10 +101,10 @@ void setup () {
   MCUSR = 0; // this is oh so important! It sets the MCU status register to 0, so the MCU doesn't keep rebooting itself!
   wdt_disable();
 
-	blinkLed(3, 50);
 	rf12_initialize(NODE_ID, RF12_868MHZ, NETGROUP);
 	rf12_encrypt(RF12_EEPROM_EKEY);
 	pinMode(LED_PIN, OUTPUT);
+	blinkLed(3, 50);
 	for (uint8_t i = 0; i < MAX_ID; i++) {
 		pinMode(socket_ids[i], OUTPUT);
 	}
